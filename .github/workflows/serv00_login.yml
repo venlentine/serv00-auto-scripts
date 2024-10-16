@@ -1,10 +1,10 @@
-name: Login
+name: Serv00 Login
 
 on:
   workflow_dispatch:
   
   schedule:
-    - cron: '7 12 */7 * *'
+    - cron: '10 12 */7 * *'
 
 env:
   ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
