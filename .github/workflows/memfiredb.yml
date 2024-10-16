@@ -20,10 +20,10 @@ jobs:
           node-version: '20.x'  
   
       - name: Install dependencies
-        run: npm install -g pg
+        run: cd memfire-db && npm install pg
   
       - name: Connect to PostgreSQL
-        run: cd memfire-db && node postgres_client.js
+        run: node postgres_client.js
         env:
           POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
