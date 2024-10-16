@@ -1,14 +1,16 @@
 const { Client } = require('pg');
 
+const encodedUrl = process.env.POSTGRES_CONNECT_URL;
+
 const pgclient = new Client({
-    host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PWD,
-    database: process.env.POSTGRES_DB
+    connectionString:encodedUrl
 });
 
 pgclient.connect();
+// 连接池初始化完成后执行查询
+pgclient.on('connect', () => {
+  console.log('Connected to PostgreSQL:' + encodedUrl);
+});
 
 const drop = 'DROP TABLE student'
 const table = 'CREATE TABLE student(id SERIAL PRIMARY KEY, firstName VARCHAR(40) NOT NULL, lastName VARCHAR(40) NOT NULL, age INT, address VARCHAR(80), email VARCHAR(40), create_time TIMESTAMP)'

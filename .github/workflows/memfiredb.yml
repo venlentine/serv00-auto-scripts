@@ -20,14 +20,14 @@ jobs:
           node-version: '20.x'  
   
       - name: Install dependencies
-        run: cd memfire-db && npm install pg
-  
+        uses: bahmutov/npm-install@v1
+        with:
+            useLockFile: false
+            working-directory: memfire-db
+
       - name: Connect to PostgreSQL
-        run: node postgres_client.js
         env:
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PWD: ${{ secrets.POSTGRES_PWD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_CONNECT_URL: ${{ secrets.POSTGRES_CONNECT_URL }}
+        run: |
+            node postgres_client.js
 
