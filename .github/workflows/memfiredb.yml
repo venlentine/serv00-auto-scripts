@@ -28,6 +28,7 @@ jobs:
       - name: Connect to PostgreSQL
         env:
           POSTGRES_CONNECT_URL: ${{ secrets.POSTGRES_CONNECT_URL }}
+        working-directory: memfire-db
         run: |
             node postgres_client.js
 
