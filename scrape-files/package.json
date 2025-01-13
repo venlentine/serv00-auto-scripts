@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "urlencode": "^2.0.0"
+  }
+}
