@@ -29,7 +29,7 @@ jobs:
         working-directory: serv00-login
         run: echo "$ACCOUNTS_JSON" > accounts.json  
   
-      - name: Login to website  
+      - name: Login to Serv00 Website
         working-directory: serv00-login
         run: |  
           set -e  
