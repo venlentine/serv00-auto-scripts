@@ -23,7 +23,6 @@ jobs:
           node-version: '20.x'  
   
       - name: Install dependencies
-        working-directory: serv00-login
         run: npm install puppeteer  
   
       - name: Create accounts.json
