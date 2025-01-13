@@ -1,6 +1,25 @@
 
 const fs = require('fs');
 const https = require('https');
+const qiniu = require('qiniu');
+
+// const jsonString = '[{"url":"https://img-home.csdnimg.cn/images/20250107060517.png","filename":"1.png"}]';
+const jsonString = process.env.DOWNLOAD_FILES;
+const urlsJson = JSON.parse(jsonString);
+const destinationFolder = './data';
+// 七牛云配置
+const accessKey = process.env.QINIU_ACCESS_KEY;
+const secretKey = process.env.QINIU_SECRET_KEY;
+// 七牛云存储空间名
+const bucket = 'carewee';
+const qiniu_folder = 'github';
+const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+const config = new qiniu.conf.Config();
+// 选择对应的存储区域
+config.zone = qiniu.zone.Zone_na0;
+const formUploader = new qiniu.form_up.FormUploader(config);
+// 缓存刷新
+const cdnManager = new qiniu.cdn.CdnManager(mac);
 
 function downloadFile(url, destination) {
   return new Promise((resolve, reject) => {
@@ -36,19 +55,62 @@ async function downloadFiles(urls, destinationFolder) {
         try {
             await downloadFile(url, destination);
             console.log(`File ${filename} downloaded successfully.`);
+            await uploadFile(`${destination}`, `${qiniu_folder}/${filename}`);
+            console.log(`File ${filename} to qiniu uploaded successfully.`);
         } catch (error) {
-            console.error(`Error downloading file ${filename}: ${error}`);
+            console.error(`Error file ${filename}: ${error}`);
         }
   }
 }
 
-// const files = process.env.DOWNLOAD_FILES;
-const jsonString = '[{"url":"https://aktv.top/live.txt","filename":"live.txt"},{"url":"https://m3u.ibert.me/txt/j_iptv.txt","filename":"j_iptv.txt"},{"url":"https://m3u.ibert.me/txt/fmml_dv6.txt","filename":"fmml_dv6.txt"},{"url":"https://m3u.ibert.me/txt/o_cn.txt","filename":"o_cn.txt"},{"url":"https://live.fanmingming.cn/tv/m3u/ipv6.m3u","filename":"ipv6.m3u"}]';
-// const jsonString = process.env.DOWNLOAD_FILES;
+// 生成上传 Token
+function uploadToken(bucket, key) {
+    const putPolicy = new qiniu.rs.PutPolicy({ scope: `${bucket}:${key}` });
+    return putPolicy.uploadToken(mac);
+}
 
-const urlsJson = JSON.parse(jsonString);
+// 上传单个文件到七牛云
+function uploadFile(localFile, key) {
+    const modifiedKey = key
+    // 上传重命名
+    let putExtra = new qiniu.form_up.PutExtra(modifiedKey);
+    putExtra.fname = modifiedKey;
 
-const destinationFolder = './data';
+    return new Promise((resolve, reject) => {
+        const token = uploadToken(bucket, modifiedKey);
+        formUploader.putFile(token, modifiedKey, localFile, putExtra, async (err, body, info) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (info.statusCode === 200) {
+                // 上传成功后刷新缓存
+                await refreshFileCache([modifiedKey]);
+                resolve(body);
+            } else {
+                reject(new Error(`上传失败: ${info.statusCode}`));
+            }
+        });
+    });
+}
+
+// 刷新缓存
+function refreshFileCache(urls) {
+    return new Promise((resolve, reject) => {
+        // 提交刷新任务
+        cdnManager.refreshUrls(urls, (err, respBody, respInfo) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (respInfo.statusCode === 200) {
+                resolve(respBody);
+            } else {
+                reject(new Error(`刷新失败: ${respInfo.statusCode}`));
+            }
+        });
+    });
+}
 
 downloadFiles(urlsJson, destinationFolder);
 

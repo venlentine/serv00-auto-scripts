@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "urlencode": "^2.0.0"
+    "urlencode": "^2.0.0",
+    "qiniu": "^7.3.2"
   }
 }

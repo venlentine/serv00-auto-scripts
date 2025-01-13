@@ -27,6 +27,8 @@ jobs:
       - name: Download files.txt
         env:
           DOWNLOAD_FILES: ${{ vars.DOWNLOAD_FILES }}
+          QINIU_ACCESS_KEY: ${{ secrets.QINIU_ACCESS_KEY }}
+          QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
         working-directory: scrape-files
         run: |
             node scrape.js
