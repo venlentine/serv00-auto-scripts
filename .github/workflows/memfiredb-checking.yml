@@ -2,9 +2,6 @@ name: Memfiredb Checking
 
 on:
   workflow_dispatch:
-  
-  schedule:
-    - cron: '10 9 */7 * *'
 
 jobs:  
   memfiredb-checking:
