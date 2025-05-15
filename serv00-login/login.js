@@ -42,7 +42,7 @@ async function delayTime(ms) {
       if (loginButton) {
         await loginButton.click();
       } else {
-        throw new Error('无法找到登录按钮');
+        throw new Error('无法找到登录按钮1');
       }
 
       // 等待登录成功（如果有跳转页面的话）

@@ -3,7 +3,7 @@ const fs = require('fs');
 const https = require('https');
 const qiniu = require('qiniu');
 
-// const jsonString = '[{"url":"https://img-home.csdnimg.cn/images/20250107060517.png","filename":"1.png"}]';
+// const jsonString = '[{"url":"https://img-home.csdnimg.cn/images/20250107060517.png","filename":"12.png"}]';
 const jsonString = process.env.DOWNLOAD_FILES;
 const urlsJson = JSON.parse(jsonString);
 const destinationFolder = './data';
